@@ -29,19 +29,19 @@ void div_periodic(int num, int denom) {
     mod = num % denom;
 
     digits.push_back(div); // digits hold digits
-
+    printf("%d", div);
 //     printf("n_zeros: %d; div: %d; mod: %d\n", n_zeros, div, mod);
     num = mod;
     if(num == 0)
         break;
-
-     }
+    }
+    printf("\n");
 }
 
 
 int main() {
 
-    div_periodic(11, 7*2);
+    div_periodic(11, 3);
     return 1;
 
 }

@@ -1,0 +1,24 @@
+
+
+I work in the field of algebraic geometry. My main responsibilities
+include accelerating exact symbolic computations
+on the GPU (using CUDA). By symbolic computations one
+understands operations performed on polynomials in one or more variables
+of very large degrees and coefficient bitlengths.
+
+The examples of such computations are the GCD (greatest common divisor) of two polynomials
+or the resultant of them. These operations have fundamental importance in
+many scientific fields: for example, in the algebraic geometry or computer graphics.
+
+When performed exactly, these operations can constitute
+a signifant performance bottleneck for many scientific algorithms.
+So our goal is to outsource these computations to the graphics processor.
+
+Here the idea is that using modular techniques we can decompose an original problem
+into a large set of independent problems over a simpler domain
+that can be solved efficiently on the GPU. Then, the result in the original
+domain can be reconstructed using polynomial interpolation and Chinese remaindering.
+
+On the average, we achieve about 100x speed-up over the best CPU-based algorithms
+currently available (Maple, NTL).
+

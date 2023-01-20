@@ -11,6 +11,46 @@
 #include <math.h>
 #include <stdio.h>
 
+template< class NT >
+class Array2D : std::vector< NT > {
+
+    using Base = std::vector< NT >;
+public:
+    using Base::empty;
+    using Base::data;
+    using Base::size;
+
+    Array2D() {}
+
+    Array2D(size_t X, size_t Y) :
+        Base(X*Y), m_X(X), m_Y(Y) {
+    }
+
+    Array2D(size_t X, size_t Y, const NT& val) :
+        Base(X*Y, val), m_X(X), m_Y(Y) {
+    }
+
+    NT *operator[](size_t y) {
+        return data() + y*m_X;
+    }
+
+    const NT *operator[](size_t y) const {
+        return data() + y*m_X;
+    }
+
+    NT& at(size_t x, size_t y) {
+        return Base::at(y*m_X + x);
+    }
+
+    const NT& at(size_t x, size_t y) const {
+        return Base::at(y*m_X + x);
+    }
+
+private:
+    size_t m_X = 0, m_Y = 0;
+};
+
+
 /** 25-26,83-84,85-86,89-90,93-94,95-96,103-104,107-108,109-110,113-114,117-118,119-120,123-124,133-134,149-150,151-152,153-154,155-156,157-158,159-160
 */
 

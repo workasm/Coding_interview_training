@@ -3,6 +3,9 @@
 // Click on the "Show input" button to enter input data to be read (from stdin).
 
 #include <iostream>
+#include <vector>
+#include <stdio.h>
+
 using namespace std;
 
 void find_3_elements(int *a, int n) {
@@ -54,9 +57,9 @@ void find_3_elements(int *a, int n) {
 
 int main() {
     
-    //int a[] = {4,5,2,1,4,9,1,3,7,6};
+    int a[] = {4,5,2,1,4,9,1,3,7,6};
     //int a[] = {4,3,2,1,5,6};
-    int a[] = {2,3,3,3,3,3,3,3,3,1,2,3};
+//     int a[] = {2,3,3,3,3,3,3,3,3,1,2,3};
     int n = sizeof(a) / sizeof(int);
     find_3_elements(a, n);    
     

@@ -10,8 +10,6 @@
 #include <math.h>
 #include <stdio.h>
 
-/** 25-26,83-84,85-86,89-90,93-94,95-96,103-104,107-108,109-110,113-114,117-118,119-120,123-124,133-134,149-150,151-152,153-154,155-156,157-158,159-160
-*/
 /**
 Given two sorted postive integer arrays A(n) and B(n) (W.L.O.G, let's
 say they are decreasingly sorted), we define a set S = {(a,b) | a \in

@@ -76,7 +76,7 @@ void subset_sum(int *A, int n) {
 
 int main() {
 
-    int x[] = {7, 3, 4, 1, 3, 4, 7, 9};
+    int x[] = {7, 3, 4, 1, 6, 8, 9};
     int n = sizeof(x) / sizeof(int);
     subset_sum(x, n);
    

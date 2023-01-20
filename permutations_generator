@@ -1,0 +1,57 @@
+
+a preliminary version:
+
+there is a one-to-one correspondence k-permutations
+of 'n' elements and falling factorial (FF-) numbers with 'n-1' digits
+where only 'k' leading digits can be non-zero.
+
+For example, an FF-number X with 5
+digits {a0, a1, a2, a3, a4} is defined as:
+
+X = a0 + 5*a1 + 5*4*a2 + 5*4*3*a3 + 5*4*3*2*a4
+
+subject to conditions:
+
+a0 < 5, a1 < 4, a2 < 3, a3 < 2, a4 < 1
+
+or, equivalently, this is a number in a mixed radix system where
+the base vector is given by [5, 4, 3, 2, 1]
+
+{{{
+Then, to convert a permutation of 'n' elements to an FF-number,
+we do the following:
+for each index 'i' (except the last one)
+count the number of elements with indices
+to the right of 'i' that are less than the current element.
+}}}
+
+Example (permutations of 5 elements):
+permutation -> FF-number
+{{{
+[5 3 2 1 4] -> [4 2 1 0]
+[1 2 5 3 4] -> [0 0 2 0]
+[2 4 3 5 1] -> [1 2 1 1] etc.
+}}}
+
+Now, suppose we wish to generate 3-permutations of [1 2 3 4 5 6]
+in lexicographical order. For this we consider all FF-numbers
+for which *only 3 leading digits can be non-zero*
+
+We start with: [0 0 0 0 0] which corresponds to the first permutation:
+[1 2 3 4 5 6] taking a length-3 prefix of the latter one yields [1 2 3]
+
+and continue in this way:
+{{{
+FF-number -> [3-permutation][remaining part]
+[0 0 0 0 0 0] -> [1 2 3][4 5 6]
+[0 0 1 0 0 0] -> [1 2 4][3 5 6]
+...
+[2 1 2 0 0 0] -> [3 2 5][1 4 6]
+[2 1 3 0 0 0] -> [3 2 6][1 5 6]
+[2 2 0 0 0 0] -> [3 4 1][2 5 6]
+...
+[5 4 2 0 0 0] -> [6 5 3][1 2 4]
+[5 4 3 0 0 0] -> [6 5 4][1 2 3]
+}}}
+
+

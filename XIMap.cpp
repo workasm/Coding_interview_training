@@ -74,11 +74,73 @@ public:
 	}
 
 public:
+    
     //! public methods:
     
-	//! Assign value \c val to interval [keyBegin, keyEnd).
-	//! Overwrites previous values in this interval. Do not change values outside this interval.
-	//! If !( keyBegin < keyEnd ), this designates an empty interval, and assign must do nothing.
+    //! Assign value \c val to interval [keyBegin, keyEnd).
+    //! Overwrites previous values in this interval. Do not change values outside this interval.
+    //! If !( keyBegin < keyEnd ), this designates an empty interval, and assign must do nothing.
+    void assign2(K const& keyBegin, K const& keyEnd, const V& val) {
+     
+        if(!(keyBegin < keyEnd)) // empty interval
+            return;
+        
+        // use lower_bound instead of 'insert' to save on V objects'
+        // assignments
+        auto i_end = m_map.lower_bound(keyEnd); // i_end.key >= keyEnd 
+        // position where we stop erasing
+        auto erase_end = i_end;
+        
+        // i_end.key >= keyEnd && keyEnd >= i_end.key => keys are equal
+        if(!(keyEnd < i_end->first) && i_end != m_map.end()) {
+            // if val is equal => need to erase until the next element
+            if(i_end->second == val)
+                erase_end++;
+        } else {
+            // keys are not equal => need to check the previous key
+            auto prev = std::prev(i_end);
+            if(!(prev->second == val)) {
+                // emplace_hint tries to insert before and after 'hint' 
+                // need to erase everything until keyEnd
+                erase_end = m_map.emplace_hint(prev, keyEnd, prev->second);
+                
+                if(i_end == std::next(erase_end))
+                    printf("YAAAAAAAAAAAAAA!\n");
+                else
+                    throw "oops!";
+            }
+        }
+      
+        auto i1 = m_map.emplace(keyBegin, val);
+        // position from where we start erasing
+        iterator erase_beg = std::next(i1.first);
+        
+        if(!i1.second) { 
+            // keyBegin already exists && its value differs from 'val'
+            if(!(i1.first->second == val)) {
+                // see if previous key has a value equal to 'val' 
+                if(i1.first != m_map.begin()) {
+                    auto prev = std::prev(i1.first);
+                    if(prev->second == val) {
+                        erase_beg = i1.first;
+                    }
+                } 
+                // set keyBegin value to 'val' unless we are going to erase it
+                if(erase_beg != i1.first)
+                    i1.first->second = val;
+            } 
+        } else { // keyBegin does not exist in the map
+        // see if prev. value equals to 'val' => then erase from keyBegin
+            auto prev = std::prev(i1.first);
+            if(prev->second == val) {
+                erase_beg = i1.first;
+            }
+        }
+
+        m_map.erase(erase_beg, erase_end);
+    }
+    
+
 	void assign(K const& keyBegin, K const& keyEnd, const V& val) {
 
         if(!(keyBegin < keyEnd)) // empty interval
@@ -141,8 +203,7 @@ public:
 
     //! delete all but the original interval initialized by constructor
 	void clear() {
-        iterator i1 = m_map.begin();
-        m_map.erase(++i1, m_map.end());
+        m_map.erase(std::next(m_map.begin()), m_map.end());
     }
 
 private:
@@ -150,17 +211,18 @@ private:
 
     //! tests whether intervals satisfy canonical representation
 	void intervals_check() {
-        const_iterator next = m_map.begin(), it = next++;
+        
+        auto next = m_map.begin(), it = next++;
         V prev = 0;
         for( ; it != m_map.end(); it++, next++) {
        // uncomment this to print intervals in the container
-#if 1    
-//             std::cout << "[" << it->first << "; ";
-//             if(next != m_map.end())
-//                 std::cout << next->first << ") = ";
-//             else
-//                 std::cout << "+oo) = ";
-//             std::cout << it->second << "\n";
+#if 0
+            std::cout << "[" << it->first << "; ";
+            if(next != m_map.end())
+                std::cout << next->first << ") = ";
+            else
+                std::cout << "+oo) = ";
+            std::cout << it->second << "\n";
 #endif            
             if(prev != 0 && prev == it->second) {
                 std::cout << "FATAL: incorrect intervals..";
@@ -180,7 +242,7 @@ struct Placeholder {
     typedef Placeholder< T > Self;
 
     Placeholder(T _i) : i(_i) { }
-
+    
     friend bool operator <(const Self& x, const Self& y) {
         return x.i < y.i;
     }
@@ -208,41 +270,52 @@ void IntervalMapTest() {
     Container cont('a');
 
     try { // simple tests first
+    
+       //cont.assign2(std::numeric_limits< int >::min(), 1, 'S');
 
-       cont.assign(std::numeric_limits< int >::min(), 1, 'S');
-       cont.assign(1, std::numeric_limits< int >::max(), 'S');
+      cont.assign2(1, 5, 'S');
+      cont.assign2(1, 5, 'S');
+      
+      cont.assign2(2, 10, 'B');
+      cont.assign2(std::numeric_limits< int >::min(), 1, 'S');
+      
+      cont.assign(2, std::numeric_limits< int >::max(), 'S');
+      
         cont.intervals_check();
        
 //         return;
        
-       cont.assign(2, 1, 'B');
-       cont.assign(2, 2, 'B');
+       cont.assign2(2, 1, 'B');
+       cont.assign2(2, 2, 'B');
        
-       cont.assign(1, 4, 'B');
-       cont.assign(1, 4, 'A');
-       cont.assign(1, 4, 'B');
-       cont.assign(1, 2, 'C');
+       cont.assign2(1, 4, 'B');
+       cont.assign2(1, 4, 'A');
+       cont.assign2(1, 4, 'B');
+       cont.assign2(1, 2, 'C');
 
-       cont.assign(20,-20, 'B') ;
+       cont.assign2(20,-20, 'B') ;
 
        cont.intervals_check();
 
 //        return;
-       cont.assign(5, 6, 'B');
-       cont.assign(7, 8, 'B');
-       cont.assign(9, 10, 'B');
-
+       cont.assign2(5, 6, 'B');
+       
        cont.intervals_check();
+       
+       cont.assign2(7, 8, 'B');
+       cont.assign2(9, 10, 'B');
 
-       cont.assign(1, 10, 'A');
+//        return;
+       
+       cont.assign2(1, 10, 'A');
        cont.intervals_check();
       
        cont.clear();
        cont.intervals_check();
 
-       srand48(time(NULL));
+       srand(time(NULL));
 
-    int niters = 80000;
+    int niters = 2000000;
     int range = 10;
     int nchars = 10; // # of characters to use
 
@@ -252,21 +325,21 @@ void IntervalMapTest() {
         
     while(niters--) {
         // boundaries of the interval [l; r]
-        int l = lrand48() % range;// - range/2;
-        int r = l + lrand48() % (range/2);
-        char c = (lrand48() % nchars) + 'a'; // value to be inserted
+        int l = rand() % range;// - range/2;
+        int r = l + rand() % (range/2);
+        char c = (rand() % nchars) + 'a'; // value to be inserted
 
-//         if(l % 71 == 0) {  // occasional clear of the container..
-//             std::cout << "clear\n";
+        if(l % 91 == 0) {  // occasional clear of the container..
+            std::cout << "clear\n";
 //             cont.clear();
-//         }
+        }
 
         // keep previous values for comparison
         char lprev = (--cont.m_map.lower_bound(l))->second;
         char rprev = cont[r];
         
         std::cout << "inserting: [" << l << "; " << r << "]: " << c << "\n";
-        cont.assign(l, r, c);
+        cont.assign2(l, r, c);
         cont.intervals_check();
 
         if(l < r && cont[l] != c) { // skip trivial intervals
